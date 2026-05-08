@@ -14,6 +14,12 @@ export class LoginPage extends BasePage {
   readonly logoutMenuItem: Locator;
   readonly forgotPasswordLink: Locator;
   readonly loginPageTitle: Locator;
+  readonly usernameRequiredMessage: Locator;
+  readonly passwordRequiredMessage: Locator;
+  readonly resetPasswordTitle: Locator;
+  readonly resetUsernameInput: Locator;
+  readonly resetCancelButton: Locator;
+  readonly resetPasswordButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -23,8 +29,14 @@ export class LoginPage extends BasePage {
     this.errorMessage = page.getByRole('alert');
     this.userDropdown = page.locator('.oxd-userdropdown-tab');
     this.logoutMenuItem = page.getByRole('menuitem', { name: 'Logout' });
-    this.forgotPasswordLink = page.getByRole('link', { name: /forgot password/i });
+    this.forgotPasswordLink = page.getByText('Forgot your password?');
     this.loginPageTitle = page.getByRole('heading', { name: /login/i });
+    this.usernameRequiredMessage = this.usernameInput.locator('..').getByText('Required');
+    this.passwordRequiredMessage = this.passwordInput.locator('..').getByText('Required');
+    this.resetPasswordTitle = page.getByRole('heading', { name: 'Reset Password' });
+    this.resetUsernameInput = page.getByPlaceholder('Username');
+    this.resetCancelButton = page.getByRole('button', { name: 'Cancel' });
+    this.resetPasswordButton = page.getByRole('button', { name: 'Reset Password' });
   }
 
   /**
@@ -77,5 +89,9 @@ export class LoginPage extends BasePage {
    */
   async clickForgotPassword(): Promise<void> {
     await this.forgotPasswordLink.click();
+  }
+
+  async cancelPasswordReset(): Promise<void> {
+    await this.resetCancelButton.click();
   }
 }

@@ -6,76 +6,99 @@ Application URL:
 https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
 ```
 
-Default demo credentials from the automation plan:
+Default demo credentials:
 
-- Username: Admin
-- Password: admin123
+- Username: `Admin`
+- Password: `admin123`
+
+## User Story Template
+
+Each story follows this Agile QA template:
+
+- **Story ID**
+- **Epic**
+- **Sprint**
+- **Priority**
+- **Story Points**
+- **User Story**
+- **Business Value**
+- **Scenario Traceability**
+- **Acceptance Criteria**
+- **Automation Mapping**
+- **Current Automation Status**
+- **Definition of Done**
+
+Status values:
+
+- **Implemented**: Matching automated coverage exists.
+- **Partial**: Some planned acceptance criteria are automated, but gaps remain.
+- **Planned**: No matching automated coverage exists yet.
+- **Configuration**: Covered by framework or CI setup rather than a single executable test.
+
+---
 
 ## QA-US-001: Baseline Playwright Framework Configuration
 
-### Description
+**Epic:** Framework Readiness  
+**Sprint:** Sprint 1  
+**Priority:** Critical  
+**Story Points:** 3  
+**Current Automation Status:** Configuration
 
-Validate and prepare the existing Playwright TypeScript framework for OrangeHRM automation. This story confirms the base URL, browser projects, reporting, screenshots, traces, fixtures, page objects, and test tagging strategy needed for later smoke, regression, accessibility, responsive, and API suites.
+**User Story:** As a QA Automation Engineer, I want the Playwright TypeScript framework configured for OrangeHRM so that the Scrum team can build reliable automation on a stable foundation.
 
-### Application URL
+**Business Value:** Establishes the reusable automation foundation for smoke, regression, API, accessibility, responsive, and cross-browser testing.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** Framework readiness
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Framework configuration supports OrangeHRM automation
-  Given the Playwright TypeScript framework is installed
+  Given the Playwright framework is installed
   When the QA engineer reviews the configuration
   Then the base URL should target the OrangeHRM demo site
   And browser projects should include desktop, mobile, and tablet coverage
-  And reports, traces, screenshots, and videos should be configured for diagnostics
+  And reports, traces, screenshots, and videos should be configured
+  And page objects, fixtures, test data, and tags should be available
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- The framework must support reusable Page Object Model classes.
-- Test data and URLs must be centralized.
-- CI-friendly output formats must be available.
+- `framework/playwright.config.ts`
+- `framework/tsconfig.json`
+- `framework/tests/fixtures/test.fixture.ts`
+- `framework/tests/pages/*.page.ts`
+- `framework/tests/utils/test-data.ts`
 
-### Technical Notes
+**Definition of Done:**
 
-- Use `framework/playwright.config.ts`.
-- Keep `BASE_URL` configurable by environment variable.
-- Preserve role-first locator strategy.
+- TypeScript type-check runs successfully.
+- Playwright test discovery lists expected suites.
+- Framework supports POM, fixtures, reporting, browser projects, and centralized test data.
 
-### Definition of Done
-
-- Configuration has been reviewed.
-- TypeScript type-check can be executed.
-- Smoke test command is documented and ready to run.
+---
 
 ## QA-US-002: Login Page Smoke Coverage
 
-### Description
+**Epic:** Smoke Automation  
+**Sprint:** Sprint 1  
+**Priority:** Critical  
+**Story Points:** 3  
+**Current Automation Status:** Implemented
 
-Automate a smoke test that confirms the OrangeHRM login page loads, the page title is correct, credential hints are visible, and the Username, Password, and Login controls are available.
+**User Story:** As a Scrum Team member, I want automated coverage for the OrangeHRM login page load so that every build confirms the application under test is reachable.
 
-### Application URL
+**Business Value:** Confirms the entry point is available before running deeper authenticated workflows.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** AUTH-001
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Login page loads successfully
   Given the user navigates to the OrangeHRM login page
-  When the page finishes loading
+  When the page is displayed
   Then the page title should be "OrangeHRM"
   And the Login heading should be visible
   And the Username field should be visible
@@ -83,83 +106,72 @@ Scenario: Login page loads successfully
   And the Login button should be visible
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- The login page is the entry point for all authenticated workflows.
-- Credential hints may appear on the demo site and can be asserted as non-critical supporting content.
+- `framework/tests/e2e/auth.spec.ts`
+- Test: `AUTH-001 @smoke @critical - Should load login page`
 
-### Technical Notes
+**Definition of Done:**
 
-- Prefer `getByRole('textbox', { name: 'Username' })`.
-- Prefer `getByRole('button', { name: 'Login' })`.
-- Tag as `@smoke @critical`.
+- Test title includes scenario ID and `@smoke @critical`.
+- Test validates title, heading, username, password, and login button.
 
-### Definition of Done
-
-- Test is implemented in the authentication suite.
-- Test passes in Chromium.
-- Failure artifacts are available when the test fails.
+---
 
 ## QA-US-003: Valid Login and Dashboard Smoke Flow
 
-### Description
+**Epic:** Smoke Automation  
+**Sprint:** Sprint 1  
+**Priority:** Critical  
+**Story Points:** 5  
+**Current Automation Status:** Implemented
 
-Automate the critical happy path where a valid user logs in and lands on the Dashboard page. This story validates authentication, redirect behavior, and the first authenticated page.
+**User Story:** As a product stakeholder, I want an automated valid login and dashboard landing test so that critical user access is verified early in every test cycle.
 
-### Application URL
+**Business Value:** Protects the highest-value happy path: authenticate and reach the dashboard.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** AUTH-002, DASH-001
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Successful login
-  Given the user navigates to the login page
+  Given the user is on the OrangeHRM login page
   When the user enters valid credentials
-  And clicks the login button
-  Then the dashboard should be displayed
-  And the page URL should contain "/dashboard/index"
+  And clicks Login
+  Then the Dashboard page should be displayed
+  And the URL should contain "/dashboard/index"
   And the Dashboard heading should be visible
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Valid public demo credentials must authenticate successfully.
-- Dashboard must be displayed only after successful authentication.
+- `framework/tests/e2e/auth.spec.ts`
+- Test: `@smoke @critical - Should login with valid credentials`
 
-### Technical Notes
-
-- Encapsulate login behavior in `LoginPage.login`.
-- Assert URL and heading rather than mutable dashboard values.
-- Tag as `@smoke @critical`.
-
-### Definition of Done
+**Definition of Done:**
 
 - Test uses centralized credentials.
-- Test passes in Chromium.
-- Test is included in the smoke command.
+- Test uses `LoginPage.login`.
+- Test asserts URL and Dashboard heading with Playwright expectations.
+
+---
 
 ## QA-US-004: Logout Smoke Flow
 
-### Description
+**Epic:** Smoke Automation  
+**Sprint:** Sprint 1  
+**Priority:** Critical  
+**Story Points:** 3  
+**Current Automation Status:** Implemented
 
-Automate logout from an authenticated session to confirm the user menu is reachable and the session exits back to the login page.
+**User Story:** As a QA Automation Engineer, I want an automated logout test so that authenticated sessions can be safely ended and validated.
 
-### Application URL
+**Business Value:** Confirms session termination and protects a critical account action.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** AUTH-008
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Successful logout
@@ -167,185 +179,159 @@ Scenario: Successful logout
   When the user opens the profile dropdown
   And selects Logout
   Then the login page should be displayed
-  And the page URL should contain "/auth/login"
+  And the URL should contain "/auth/login"
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Authenticated users must be able to end their session.
-- Logout must return the user to the login page.
+- `framework/tests/e2e/auth.spec.ts`
+- Test: `AUTH-008 @smoke @critical - Should logout successfully`
 
-### Technical Notes
+**Definition of Done:**
 
-- Use the user dropdown menu item with accessible role `menuitem`.
-- Avoid asserting the displayed user name because demo data may vary.
+- Test uses `LoginPage.logout`.
+- Test asserts return to the login route.
 
-### Definition of Done
-
-- Logout helper exists in the page object.
-- Test passes from a logged-in session.
-- Test is tagged as smoke or critical.
+---
 
 ## QA-US-005: PIM Navigation Smoke Flow
 
-### Description
+**Epic:** Smoke Automation  
+**Sprint:** Sprint 1  
+**Priority:** Critical  
+**Story Points:** 3  
+**Current Automation Status:** Implemented
 
-Automate navigation from the Dashboard to the PIM Employee List page to verify that a critical HR module is reachable after login.
+**User Story:** As a Scrum Team member, I want automated navigation from Dashboard to PIM so that a critical employee-management module is available after login.
 
-### Application URL
+**Business Value:** Confirms authenticated users can reach the main employee management area.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** PIM-001
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Navigate to PIM Employee List
-  Given the user is logged in to OrangeHRM
-  When the user clicks the PIM navigation link
+  Given the user is logged in and on the Dashboard
+  When the user selects the PIM navigation link
   Then the PIM page should be displayed
   And the Employee Information heading should be visible
-  And the page URL should contain "/pim/viewEmployeeList"
+  And the URL should contain "/pim/viewEmployeeList"
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- PIM is a core employee-management module.
-- Navigation should be available from the main side panel after authentication.
+- `framework/tests/e2e/pim.spec.ts`
+- Test: `PIM-001 @smoke @critical - Should navigate from Dashboard to PIM employee list`
+- Test: `PIM-001 PIM-002 @smoke @critical - Should display employee information page`
 
-### Technical Notes
+**Definition of Done:**
 
-- Use `getByRole('link', { name: 'PIM' })`.
-- Tag as `@smoke @regression`.
+- Keep PIM page assertions for heading and Employee Information section.
 
-### Definition of Done
-
-- PIM navigation method exists in a page object or helper.
-- Test passes in Chromium.
-- Test is included in smoke coverage.
+---
 
 ## QA-US-006: Invalid Login Validation
 
-### Description
+**Epic:** Authentication E2E  
+**Sprint:** Sprint 2  
+**Priority:** Critical  
+**Story Points:** 3  
+**Current Automation Status:** Implemented
 
-Automate invalid credential validation to confirm that OrangeHRM prevents access and displays the expected error alert.
+**User Story:** As a QA Automation Engineer, I want automated invalid credential validation so that authentication error handling is protected from regression.
 
-### Application URL
+**Business Value:** Verifies failed login is blocked and user feedback is visible.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** AUTH-003
 
-### Test Credentials
-
-- Username: invalid-user
-- Password: invalid-password
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Invalid login displays an error
-  Given the user navigates to the login page
+  Given the user is on the login page
   When the user enters invalid credentials
-  And clicks the login button
-  Then an alert should be displayed
-  And the alert text should contain "Invalid credentials"
-  And the user should remain on the login page
+  And clicks Login
+  Then an error alert should be displayed
+  And the user should remain unauthenticated
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Invalid credentials must not authenticate.
-- Error feedback must be visible to the user.
+- `framework/tests/e2e/auth.spec.ts`
+- Test: `@smoke @critical - Should display error for invalid credentials`
 
-### Technical Notes
+**Definition of Done:**
 
-- Assert role `alert`.
-- Do not rely on screenshot comparison.
+- Test uses invalid credentials from centralized test data.
+- Test asserts the error alert with a web-first assertion.
 
-### Definition of Done
-
-- Negative authentication test is automated.
-- Test uses isolated invalid credentials.
-- Test is tagged as `@critical` or `@regression`.
+---
 
 ## QA-US-007: Required Field Validation
 
-### Description
+**Epic:** Authentication E2E  
+**Sprint:** Sprint 2  
+**Priority:** High  
+**Story Points:** 5  
+**Current Automation Status:** Implemented
 
-Automate username and password required-field validation so the team can detect regressions in login form validation.
+**User Story:** As an end user, I want username and password required-field validation to be tested automatically so that login form validation remains clear and functional.
 
-### Application URL
+**Business Value:** Prevents regressions in mandatory field validation.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** AUTH-004, AUTH-005
 
-### Test Credentials
-
-- Username: TBD for empty-field scenario
-- Password: TBD for empty-field scenario
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Username is required
-  Given the user navigates to the login page
-  When the user leaves the username field blank
-  And enters a password
-  And clicks the login button
+  Given the user is on the login page
+  When the user submits the form without a username
   Then a Required validation message should be displayed for the username field
 
 Scenario: Password is required
-  Given the user navigates to the login page
-  When the user enters a username
-  And leaves the password field blank
-  And clicks the login button
+  Given the user is on the login page
+  When the user submits the form without a password
   Then a Required validation message should be displayed for the password field
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Username is mandatory.
-- Password is mandatory.
-- Required-field validation must block login submission.
+- `framework/tests/e2e/auth.spec.ts`
+- Test: `AUTH-004 @regression - Should validate username field is required`
+- Test: `AUTH-005 @regression - Should validate password field is required`
 
-### Technical Notes
+**Definition of Done:**
 
-- Use field-adjacent validation locators encapsulated in the page object.
-- Keep assertions resilient to DOM wrapper changes.
+- Keep username and password required validation.
+- Encapsulate validation locators in `LoginPage` for maintainability.
 
-### Definition of Done
-
-- Username required validation is covered.
-- Password required validation is covered.
-- Tests pass in Chromium.
+---
 
 ## QA-US-008: Forgot Password Flow
 
-### Description
+**Epic:** Authentication E2E  
+**Sprint:** Sprint 2  
+**Priority:** Medium  
+**Story Points:** 3  
+**Current Automation Status:** Implemented
 
-Automate the forgot password flow to confirm the reset page is reachable and provides a username field plus Cancel and Reset Password actions.
+**User Story:** As an OrangeHRM user, I want the forgot password flow automated so that account recovery entry points remain available.
 
-### Application URL
+**Business Value:** Protects the account recovery entry point and cancel path.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** AUTH-006, AUTH-007
 
-### Test Credentials
-
-- Username: Admin
-- Password: not required for reset navigation
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Forgot password page opens
-  Given the user navigates to the login page
+  Given the user is on the login page
   When the user clicks Forgot your password
   Then the Reset Password page should be displayed
   And the Username field should be visible
-  And the Cancel button should be visible
-  And the Reset Password button should be visible
+  And Cancel and Reset Password buttons should be visible
 
 Scenario: Cancel password reset
   Given the user is on the Reset Password page
@@ -353,268 +339,224 @@ Scenario: Cancel password reset
   Then the login page should be displayed
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Account recovery entry point must be available from login.
-- Cancel should not submit a reset request.
+- `framework/tests/e2e/auth.spec.ts`
+- Test: `AUTH-006 @regression - Should navigate to forgot password page`
+- Test: `AUTH-007 @regression - Should cancel forgot password flow`
 
-### Technical Notes
+**Definition of Done:**
 
-- Assert URL contains `/requestPasswordResetCode`.
-- Avoid testing email delivery in the public demo environment.
+- Assert reset page heading and controls.
+- Assert Cancel returns to login.
+- Keep email delivery out of scope.
 
-### Definition of Done
-
-- Forgot password navigation is automated.
-- Cancel behavior is automated.
-- Tests are tagged as regression.
+---
 
 ## QA-US-009: Dashboard Widget Rendering
 
-### Description
+**Epic:** Dashboard E2E  
+**Sprint:** Sprint 2  
+**Priority:** High  
+**Story Points:** 5  
+**Current Automation Status:** Implemented
 
-Automate dashboard rendering checks for key widgets and stable headings after login.
+**User Story:** As a product stakeholder, I want dashboard widgets validated automatically so that the landing page continues to show key HR summaries.
 
-### Application URL
+**Business Value:** Validates visible authenticated dashboard content without relying on mutable counts.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** DASH-001, DASH-006
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Dashboard widgets render
-  Given the user is logged in to OrangeHRM
-  When the Dashboard page loads
-  Then the Time at Work widget should be visible
-  And the My Actions widget should be visible
-  And the Quick Launch widget should be visible
-  And the Buzz Latest Posts widget should be visible
-  And employee distribution widgets should be visible
+  Given the user is logged in
+  When the Dashboard page is displayed
+  Then stable dashboard widget headings should be visible
+  And no generic application error should be visible
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Dashboard values are mutable and should not be hard-coded.
-- Widget containers and headings are stable automation targets.
+- `framework/tests/e2e/dashboard.spec.ts`
+- Tests for dashboard load, core widgets, employee distribution widgets, employees on leave widget, and no application error text.
 
-### Technical Notes
+**Definition of Done:**
 
-- Use heading/text assertions.
-- Do not assert exact counts, dates, or names.
+- Assert stable widget headings only.
+- Avoid exact widget values from the public demo.
 
-### Definition of Done
-
-- Dashboard page object exposes widget locators.
-- Test passes with live demo data.
-- Test is tagged as regression.
+---
 
 ## QA-US-010: User Dropdown Menu
 
-### Description
+**Epic:** Dashboard E2E  
+**Sprint:** Sprint 2  
+**Priority:** High  
+**Story Points:** 3  
+**Current Automation Status:** Implemented
 
-Automate the authenticated user dropdown menu to verify account-related menu items remain accessible.
+**User Story:** As an authenticated user, I want user-menu options validated automatically so that account actions such as logout remain accessible.
 
-### Application URL
+**Business Value:** Protects account-level navigation and logout discoverability.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** DASH-003, AUTH-008
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: User dropdown shows account actions
-  Given the user is logged in to OrangeHRM
+  Given the user is logged in
   When the user opens the profile dropdown
-  Then the About menu item should be visible
-  And the Support menu item should be visible
-  And the Change Password menu item should be visible
-  And the Logout menu item should be visible
+  Then About should be visible
+  And Support should be visible
+  And Change Password should be visible
+  And Logout should be visible
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Authenticated account actions must be visible through the user menu.
-- The displayed profile name may vary and should not be a strict assertion.
+- `framework/tests/e2e/dashboard.spec.ts`
+- Test: `DASH-003 @regression - Should display user menu account actions`
+- `framework/tests/e2e/auth.spec.ts` covers Logout action.
 
-### Technical Notes
+**Definition of Done:**
 
-- Prefer role `menuitem`.
-- Encapsulate dropdown opening in `DashboardPage`.
+- Assert About, Support, Change Password, and Logout menu items.
+- Keep displayed profile name out of assertions because demo data varies.
 
-### Definition of Done
-
-- Menu open behavior is automated.
-- All expected menu items are asserted.
-- Test remains independent from exact user display name.
+---
 
 ## QA-US-011: Quick Launch Navigation
 
-### Description
+**Epic:** Dashboard E2E  
+**Sprint:** Sprint 2  
+**Priority:** High  
+**Story Points:** 5  
+**Current Automation Status:** Implemented
 
-Automate Dashboard Quick Launch shortcut visibility and representative navigation to verify high-use HR actions remain reachable.
+**User Story:** As an OrangeHRM user, I want dashboard Quick Launch shortcuts tested automatically so that common HR actions remain reachable.
 
-### Application URL
+**Business Value:** Protects high-use navigation shortcuts from the Dashboard.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** DASH-004, DASH-005
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
-Scenario: Quick Launch shortcuts are available
-  Given the user is logged in to OrangeHRM
-  When the Dashboard page loads
-  Then the Assign Leave shortcut should be visible
-  And the Leave List shortcut should be visible
-  And the Timesheets shortcut should be visible
-  And the Apply Leave shortcut should be visible
-  And the My Leave shortcut should be visible
-  And the My Timesheet shortcut should be visible
-
-Scenario: Quick Launch shortcut navigates to target workflow
-  Given the user is on the Dashboard page
-  When the user selects a Quick Launch shortcut
-  Then the corresponding module page should be displayed
+Scenario: Quick Launch shortcuts are visible and navigable
+  Given the user is on the Dashboard
+  When the Quick Launch section is displayed
+  Then representative shortcut buttons should be visible
+  And selected shortcuts should navigate to their target workflows
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Quick Launch shortcuts must remain reachable from Dashboard.
-- Navigation success should be validated by URL or page heading.
+- `framework/tests/e2e/dashboard.spec.ts`
+- Tests for Quick Launch visibility, Assign Leave navigation, and Leave List navigation.
 
-### Technical Notes
+**Definition of Done:**
 
-- Test one or two representative shortcuts in depth.
-- Assert all shortcuts are visible.
+- Assert all observed Quick Launch controls are visible.
+- Keep representative navigation tests focused and stable.
 
-### Definition of Done
-
-- Shortcut visibility test is automated.
-- Representative navigation test is automated.
-- Tests avoid exact mutable content assertions.
+---
 
 ## QA-US-012: Employee List Page
 
-### Description
+**Epic:** PIM E2E  
+**Sprint:** Sprint 3  
+**Priority:** Critical  
+**Story Points:** 3  
+**Current Automation Status:** Implemented
 
-Automate PIM Employee List rendering checks, including the Employee Information section, filters, Search and Reset buttons, and employee table headers.
+**User Story:** As an HR user, I want Employee List page rendering automated so that employee records can be accessed reliably.
 
-### Application URL
+**Business Value:** Verifies the main PIM search and record-list entry point is available.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** PIM-001, PIM-002
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Employee List page renders
-  Given the user is logged in to OrangeHRM
-  When the user navigates to PIM
+  Given the user is logged in
+  When the user opens PIM Employee List
   Then the Employee Information heading should be visible
-  And the Employee Name filter should be visible
-  And the Employee Id filter should be visible
-  And the Search button should be visible
-  And the Reset button should be visible
-  And the employee table should be visible
+  And Search and Reset controls should be visible
+  And the employee table or records summary should be visible
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- PIM Employee List is the main entry point for employee search and maintenance.
-- Table content is mutable and should be treated dynamically.
+- `framework/tests/e2e/pim.spec.ts`
+- Tests for Employee Information page, search controls, and employee records.
 
-### Technical Notes
+**Definition of Done:**
 
-- Assert table headers where stable.
-- Avoid fixed record-count assertions.
+- Assert core filter and action controls.
+- Avoid exact record-count assertions.
 
-### Definition of Done
-
-- PIM page object exposes filter and table locators.
-- Test passes with current demo data.
-- Test is tagged as smoke/regression.
+---
 
 ## QA-US-013: Employee Search and Reset
 
-### Description
+**Epic:** PIM E2E  
+**Sprint:** Sprint 3  
+**Priority:** High  
+**Story Points:** 5  
+**Current Automation Status:** Implemented
 
-Automate employee search by reading an existing employee ID from the current table, searching for it, and verifying reset clears the filter.
+**User Story:** As an HR user, I want employee search and reset behavior automated so that I can locate records without stale filters.
 
-### Application URL
+**Business Value:** Validates a high-frequency employee lookup workflow using current demo data.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** PIM-003, PIM-004
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Search by existing employee ID
-  Given the user is on the PIM Employee List page
-  And an employee ID is available in the current table
-  When the user enters that employee ID in the Employee Id filter
-  And clicks Search
-  Then the results should include a row with the searched employee ID
+  Given an employee ID is available in the current table
+  When the user searches by that employee ID
+  Then the results should include that employee ID
 
 Scenario: Reset employee search filters
-  Given the user has entered an employee ID filter
+  Given an employee ID filter has been entered
   When the user clicks Reset
   Then the Employee Id filter should be cleared
+  And employee records should be visible again
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Search should operate on current live data.
-- Reset should clear stale filters.
+- `framework/tests/e2e/pim.spec.ts`
+- Tests for employee ID search and reset.
 
-### Technical Notes
+**Definition of Done:**
 
-- Discover data at runtime.
-- Skip or fail clearly if no usable employee ID is available.
-- Encapsulate table parsing in `PimPage`.
+- Confirm the reset test asserts cleared filter value and visible records.
+- Keep dynamic employee ID discovery to avoid brittle fixed data.
 
-### Definition of Done
-
-- Search by discovered employee ID is automated.
-- Reset validation is automated.
-- Test does not depend on a fixed employee record.
+---
 
 ## QA-US-014: Add Employee Validation
 
-### Description
+**Epic:** PIM E2E  
+**Sprint:** Sprint 3  
+**Priority:** High  
+**Story Points:** 3  
+**Current Automation Status:** Implemented
 
-Automate Add Employee required-field validation to confirm incomplete records cannot be saved without mandatory names.
+**User Story:** As an HR user, I want Add Employee required-field validation automated so that incomplete employee records cannot be submitted silently.
 
-### Application URL
+**Business Value:** Protects employee data quality and validation behavior.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** PIM-006
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Add Employee requires mandatory name fields
@@ -624,520 +566,437 @@ Scenario: Add Employee requires mandatory name fields
   And the employee record should not be created
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Employee Full Name required fields must be enforced.
-- Invalid submissions must keep the user on the Add Employee page.
+- `framework/tests/e2e/pim.spec.ts`
+- Test: `PIM-006 @regression - Should validate required fields on Add Employee`
 
-### Technical Notes
+**Definition of Done:**
 
-- Navigate through PIM topbar or direct route after authentication.
-- Do not assert default employee ID value.
+- Add Employee page object exposes Save and validation messages.
+- Regression test verifies empty required fields.
 
-### Definition of Done
-
-- Required validation test is automated.
-- Test asserts the page remains on Add Employee.
-- Test is tagged as regression.
+---
 
 ## QA-US-015: Add Employee Happy Path
 
-### Description
+**Epic:** PIM E2E  
+**Sprint:** Sprint 3  
+**Priority:** High  
+**Story Points:** 8  
+**Current Automation Status:** Implemented
 
-Automate creation of a new employee using unique generated test data, then verify the resulting employee details page and searchability where possible.
+**User Story:** As an HR user, I want new employee creation automated with unique data so that the PIM create flow is protected from regression.
 
-### Application URL
+**Business Value:** Covers the most important PIM create workflow while reducing data collision risk.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** PIM-005, PIM-007, PIM-008
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Add a new employee
-  Given the user is logged in to OrangeHRM
-  And the user is on the Add Employee page
-  When the user enters a unique first name
-  And enters a unique last name
+  Given the user is on the Add Employee page
+  When the user enters unique employee data
   And saves the employee
   Then the employee details page should be displayed
   And the employee name should match the submitted data
 
 Scenario: Newly created employee is searchable
   Given a unique employee has been created
-  When the user searches for the created employee in Employee List
-  Then the results should include the created employee
+  When the user searches for that employee
+  Then the Employee List results should include the created employee
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Test data must be unique to reduce collisions in the shared demo environment.
-- Cleanup is not required unless reliable ownership and deletion are available.
+- `framework/tests/e2e/pim.spec.ts`
+- Test: `PIM-005 @regression - Should navigate to add employee page`
+- Test: `PIM-007 PIM-008 @regression - Should create and find a unique employee`
 
-### Technical Notes
+**Definition of Done:**
 
-- Use timestamp or GUID suffixes.
-- Consider serial execution for create/search dependency.
-- Avoid destructive cleanup unless explicitly safe.
+- Use generated unique employee data.
+- Verify personal details load after create.
+- Search the created employee by generated employee ID.
+- Run serially if the public demo environment causes data dependency risk.
 
-### Definition of Done
-
-- Add employee happy path is automated.
-- Created data is unique.
-- Search verification is automated or clearly documented if blocked by demo instability.
+---
 
 ## QA-US-016: Login Accessibility
 
-### Description
+**Epic:** Accessibility  
+**Sprint:** Sprint 4  
+**Priority:** High  
+**Story Points:** 5  
+**Current Automation Status:** Implemented
 
-Automate basic accessibility checks on the login page using axe and role-based assertions for critical form controls.
+**User Story:** As a user relying on assistive technology, I want the login page checked for accessibility issues so that authentication remains usable.
 
-### Application URL
+**Business Value:** Improves accessibility coverage for the entry point.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** A11Y-001, A11Y-005
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
-Scenario: Login page has no critical accessibility violations
-  Given the user navigates to the login page
-  When an accessibility scan is executed
-  Then no critical accessibility violations should be reported
-  And the Username field should have an accessible name
-  And the Password field should have an accessible name
-  And the Login button should have an accessible name
+Scenario: Login page accessibility is checked
+  Given the user is on the login page
+  When automated accessibility checks run
+  Then no agreed critical violations should be reported
+  And login form controls should have accessible names
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Authentication must be accessible to users with assistive technology.
-- Critical issues should fail the automated accessibility test.
+- `framework/tests/accessibility/wcag-compliance.spec.ts`
+- Tests for login axe scan and form labels.
 
-### Technical Notes
+**Definition of Done:**
 
-- Use `@axe-core/playwright`.
-- Configure severity threshold to avoid blocking on minor known demo issues unless agreed.
+- Critical-severity threshold is used for public-demo axe scans.
+- Keep form-control accessible-name checks.
+- Document known violations if the third-party demo cannot be changed.
 
-### Definition of Done
-
-- Login axe scan is automated.
-- Accessible names for core controls are asserted.
-- Test is tagged as `@a11y`.
+---
 
 ## QA-US-017: Dashboard and PIM Accessibility
 
-### Description
+**Epic:** Accessibility  
+**Sprint:** Sprint 4  
+**Priority:** High  
+**Story Points:** 8  
+**Current Automation Status:** Implemented
 
-Automate basic accessibility scans on authenticated Dashboard and PIM pages to catch critical issues in core post-login workflows.
+**User Story:** As a user relying on assistive technology, I want Dashboard and PIM pages checked for accessibility issues so that core post-login workflows remain accessible.
 
-### Application URL
+**Business Value:** Expands accessibility checks beyond authentication into authenticated workflows.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** A11Y-002, A11Y-003
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
-Scenario: Dashboard has no critical accessibility violations
-  Given the user is logged in to OrangeHRM
-  When an accessibility scan is executed on the Dashboard page
-  Then no critical accessibility violations should be reported
-  And the Dashboard heading should be visible
-
-Scenario: PIM Employee List has no critical accessibility violations
-  Given the user is logged in to OrangeHRM
-  When the user navigates to PIM
-  And an accessibility scan is executed
-  Then no critical accessibility violations should be reported
-  And the Employee Information heading should be visible
+Scenario: Authenticated pages have accessibility coverage
+  Given the user is logged in
+  When accessibility checks run on Dashboard and PIM
+  Then no agreed critical violations should be reported
+  And each page should expose a visible heading
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Core authenticated pages should remain accessible.
-- Accessibility checks should supplement, not replace, manual accessibility review.
+- `framework/tests/accessibility/wcag-compliance.spec.ts`
+- Dashboard color contrast and landmark checks exist.
+- PIM critical accessibility scan exists.
 
-### Technical Notes
+**Definition of Done:**
 
-- Use authenticated fixture setup.
-- Document any known exclusions if public demo markup causes repeat false positives.
+- Maintain targeted Dashboard checks.
+- Maintain PIM Employee List accessibility scan.
+- Keep checks focused on actionable severity levels.
 
-### Definition of Done
-
-- Dashboard axe scan is automated.
-- PIM axe scan is automated.
-- Critical violations fail the test.
+---
 
 ## QA-US-018: Keyboard Navigation
 
-### Description
+**Epic:** Accessibility  
+**Sprint:** Sprint 4  
+**Priority:** High  
+**Story Points:** 5  
+**Current Automation Status:** Implemented with documented limitation
 
-Automate keyboard-only checks for login and key authenticated actions to ensure the application is usable without a mouse.
+**User Story:** As a keyboard-only user, I want login, navigation, and user-menu flows tested automatically so that critical actions do not require a mouse.
 
-### Application URL
+**Business Value:** Confirms critical workflows are keyboard reachable.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** A11Y-004
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
-Scenario: Login can be completed with keyboard navigation
-  Given the user navigates to the login page
-  When the user navigates through fields using the keyboard
-  And enters valid credentials
-  And submits the form
-  Then the Dashboard page should be displayed
+Scenario: Login flow supports keyboard use
+  Given the user is on the login page
+  When the user navigates through controls with the keyboard
+  Then focus should move to interactive controls
+  And the user should be able to complete or submit the login flow
 
-Scenario: User menu can be operated with keyboard navigation
-  Given the user is logged in to OrangeHRM
-  When the user focuses the profile dropdown with the keyboard
-  And opens the menu
-  Then account menu options should be reachable
+Scenario: User menu supports keyboard use
+  Given the user is logged in
+  When the user opens the account menu with the keyboard
+  Then account actions should be reachable
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Critical user journeys should not require pointer-only interaction.
-- Focus order should allow completion of primary workflows.
+- `framework/tests/accessibility/wcag-compliance.spec.ts`
+- Current tests cover Tab navigation, focus indicator, and keyboard login submission.
+- User-menu keyboard operation remains documented as a public demo markup limitation.
 
-### Technical Notes
+**Definition of Done:**
 
-- Use Playwright keyboard APIs.
-- Assert focus and final navigation outcomes.
+- Keep keyboard login completion coverage.
+- Document user-menu keyboard limitation if it cannot be operated by keyboard in the demo markup.
 
-### Definition of Done
-
-- Keyboard login test is automated.
-- User menu keyboard coverage is automated or documented if blocked by app behavior.
-- Tests are tagged as `@a11y`.
+---
 
 ## QA-US-019: Mobile Login and Dashboard
 
-### Description
+**Epic:** Responsive Automation  
+**Sprint:** Sprint 4  
+**Priority:** High  
+**Story Points:** 5  
+**Current Automation Status:** Implemented
 
-Automate responsive checks for login and Dashboard at mobile viewport sizes, focusing on usability and critical content visibility.
+**User Story:** As a mobile user, I want login and dashboard responsive behavior validated so that the application remains usable on smaller viewports.
 
-### Application URL
+**Business Value:** Reduces mobile usability regression risk for critical entry and dashboard flows.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** RWD-001, RWD-002, RWD-003
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
-Scenario: Login page is usable on mobile
-  Given the browser viewport is set to a mobile size
-  When the user navigates to the login page
-  Then the Username field should be visible
-  And the Password field should be visible
-  And the Login button should be visible
-
-Scenario: Dashboard is usable on mobile
-  Given the browser viewport is set to a mobile size
-  And the user is logged in
-  When the Dashboard page loads
-  Then the Dashboard heading should be visible
-  And core dashboard widgets should be visible in a stacked layout
+Scenario: Login and Dashboard remain usable on mobile
+  Given the test is running in a mobile viewport
+  When the user opens Login and authenticates
+  Then login controls should be visible and usable
+  And Dashboard heading and core widgets should remain reachable
+  And the mobile user menu should remain reachable
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Mobile checks validate usability, not pixel-perfect layout.
-- Critical controls must remain reachable.
+- `framework/tests/e2e/responsive.spec.ts`
+- Test: `RWD-001 RWD-002 RWD-003 @responsive @regression - Should support mobile login and dashboard`
 
-### Technical Notes
+**Definition of Done:**
 
-- Use Playwright mobile projects or explicit viewport.
-- Avoid brittle coordinate-based assertions.
+- Verify mobile login controls, dashboard heading/widgets, and user-menu reachability.
 
-### Definition of Done
-
-- Mobile login responsive test is automated.
-- Mobile dashboard responsive test is automated.
-- Tests pass in Mobile Chrome or equivalent project.
+---
 
 ## QA-US-020: Tablet and Mobile PIM Forms
 
-### Description
+**Epic:** Responsive Automation  
+**Sprint:** Sprint 4  
+**Priority:** Medium  
+**Story Points:** 5  
+**Current Automation Status:** Implemented
 
-Automate responsive checks for PIM Employee List and Add Employee forms on tablet or mobile-like viewports.
+**User Story:** As an HR user on a smaller device, I want PIM forms validated on responsive viewports so that employee workflows remain usable.
 
-### Application URL
+**Business Value:** Protects PIM usability across tablet and mobile-like layouts.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** RWD-004
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
-Scenario: PIM Employee List remains usable on responsive viewport
-  Given the browser viewport is set to a tablet or mobile size
-  And the user is logged in
-  When the user navigates to PIM
-  Then the Employee Information section should be visible
-  And Search and Reset controls should be reachable
-
-Scenario: Add Employee form remains usable on responsive viewport
-  Given the browser viewport is set to a tablet or mobile size
-  And the user is on the Add Employee page
-  Then the First Name field should be visible
-  And the Last Name field should be visible
-  And the Save button should be reachable
+Scenario: PIM forms remain usable on responsive viewports
+  Given the test is running in a tablet or mobile viewport
+  When the user opens PIM Employee List or Add Employee
+  Then critical form controls should be visible or reachable
+  And no blocking overlap should prevent use
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- PIM responsive testing should prioritize form usability.
-- Exact desktop parity is not required on smaller viewports.
+- `framework/tests/e2e/responsive.spec.ts`
+- Test: `RWD-004 @responsive @regression - Should keep PIM forms usable on tablet viewport`
 
-### Technical Notes
+**Definition of Done:**
 
-- Prefer tablet for PIM if mobile table layout is constrained.
-- Assert visibility and reachability rather than exact CSS positions.
+- Assert tablet PIM list controls and Add Employee form controls.
+- Prefer tablet for complex PIM forms if phone layout is constrained.
 
-### Definition of Done
-
-- Responsive PIM list check is automated.
-- Responsive Add Employee check is automated.
-- Any app limitations are documented.
+---
 
 ## QA-US-021: Login and Protected Route API Contracts
 
-### Description
+**Epic:** API and Contracts  
+**Sprint:** Sprint 5  
+**Priority:** High  
+**Story Points:** 5  
+**Current Automation Status:** Implemented
 
-Automate HTTP contract checks for the public login page and protected authenticated routes to verify expected availability and access behavior.
+**User Story:** As a QA Automation Engineer, I want HTTP contract checks for public and protected routes so that routing and access behavior remains stable.
 
-### Application URL
+**Business Value:** Validates route availability and authentication protection without launching the UI.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** API-001, API-002, AUTH-001
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
-Scenario: Login page returns success
-  Given an unauthenticated API request context
+Scenario: Login and protected route contracts are valid
+  Given an unauthenticated request context
   When the client requests the login page
-  Then the response status should be 200
-
-Scenario: Protected dashboard route requires authentication
-  Given an unauthenticated API request context
-  When the client requests the dashboard route
-  Then the response should redirect to login or otherwise indicate authentication is required
+  Then the response should be successful
+  When the client requests the protected dashboard route
+  Then the response should redirect to login or require authentication
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Public routes should be available.
-- Protected routes should not expose authenticated content without a session.
+- `framework/tests/api/user-api.spec.ts`
+- Tests for login page retrieval and protected dashboard redirect.
 
-### Technical Notes
+**Definition of Done:**
 
-- Use Playwright `request` fixture.
-- Keep assertions flexible for redirect status differences.
+- API tests run with `@api` tag.
+- Tests assert status/header behavior without relying on mutable UI data.
 
-### Definition of Done
-
-- Login HTTP contract is automated.
-- Protected route behavior is automated.
-- Tests are tagged as `@api`.
+---
 
 ## QA-US-022: Dashboard Widget API Contracts
 
-### Description
+**Epic:** API and Contracts  
+**Sprint:** Sprint 5  
+**Priority:** High  
+**Story Points:** 8  
+**Current Automation Status:** Implemented
 
-Automate contract checks for Dashboard widget endpoints observed during exploration, validating response status and top-level JSON shape after authentication.
+**User Story:** As a Scrum Team member, I want dashboard API widget endpoints validated so that UI widgets have reliable backend responses.
 
-### Application URL
+**Business Value:** Adds contract coverage for API-backed dashboard widgets.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** DASH-007, API-003
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
-Scenario: Dashboard widget APIs return successful responses
+Scenario: Dashboard widget APIs return structured responses
   Given the user has an authenticated request context
-  When the client requests dashboard widget API endpoints
-  Then each endpoint should return a 200 response
-  And each response should contain valid JSON
+  When dashboard widget endpoints are requested
+  Then each endpoint should return a successful status
+  And each response should contain valid JSON with expected top-level structure
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Dashboard widgets depend on API responses.
-- Contract tests should validate availability and structure, not volatile widget values.
+- `framework/tests/api/user-api.spec.ts`
+- Test: `API-003 DASH-007 @api @regression - Should validate dashboard widget contracts`
 
-### Technical Notes
+**Definition of Done:**
 
-- Endpoints include time-at-work, action-summary, shortcuts, buzz feed, leaves, subunit, and locations.
-- Reuse authenticated session setup where possible.
+- Authenticated request/session setup is established through UI login.
+- Dashboard widget endpoint list is asserted for successful JSON responses.
+- Assert status and stable response shape only.
 
-### Definition of Done
-
-- Dashboard widget endpoint list is centralized.
-- Contract tests are automated.
-- Tests are tagged as `@api @regression`.
+---
 
 ## QA-US-023: Cross-Browser Smoke Execution
 
-### Description
+**Epic:** Cross-Browser Regression  
+**Sprint:** Sprint 5  
+**Priority:** High  
+**Story Points:** 5  
+**Current Automation Status:** Configuration
 
-Configure and validate smoke execution across desktop and mobile browser projects to reduce release compatibility risk.
+**User Story:** As a release owner, I want smoke tests to run across Chromium, Firefox, WebKit, and mobile projects so that browser compatibility risk is reduced.
 
-### Application URL
+**Business Value:** Expands confidence beyond a single browser and surfaces compatibility issues early.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** CB-001
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: Smoke suite runs across supported browser projects
-  Given the smoke suite is implemented
-  When the test runner executes supported browser projects
-  Then smoke tests should run in Chromium
-  And smoke tests should run in Firefox
-  And smoke tests should run in WebKit
-  And smoke tests should run in mobile browser projects
+  Given smoke tests are implemented
+  When the smoke suite runs
+  Then tests should execute in Chromium, Firefox, WebKit, Mobile Chrome, Mobile Safari, and Tablet projects
+  And browser-specific failures should produce diagnostics
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Critical access flows must be browser compatible.
-- Full regression can remain focused on Chromium unless scheduled differently.
+- `framework/playwright.config.ts`
+- `framework/.github/workflows/tests.yml`
+- Full headed run previously exposed cross-browser failures, so this remains a hardening track.
 
-### Technical Notes
+**Definition of Done:**
 
-- Use existing Playwright projects.
-- Keep workers low against the live public demo.
+- Smoke command is verified across configured projects.
+- Cross-browser failures are triaged and linked to defects or hardening stories.
 
-### Definition of Done
-
-- Smoke suite runs across configured projects.
-- Browser-specific failures generate artifacts.
-- Execution command is documented.
+---
 
 ## QA-US-024: CI Reporting and Test Artifacts
 
-### Description
+**Epic:** CI/CD Enablement  
+**Sprint:** Sprint 5  
+**Priority:** High  
+**Story Points:** 5  
+**Current Automation Status:** Configuration
 
-Enable CI reporting for Playwright automation so failures are diagnosable by the Scrum team.
+**User Story:** As a Scrum Team member, I want CI to publish Playwright reports, traces, screenshots, videos, JSON, and JUnit output so that failures are diagnosable.
 
-### Application URL
+**Business Value:** Makes automation results actionable for sprint reviews, defect triage, and release decisions.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** CI-001
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
 Scenario: CI publishes automation results
   Given the automation suite runs in CI
-  When tests complete
+  When test execution completes
   Then an HTML report should be generated
   And JSON and JUnit results should be generated
-  And screenshots, videos, and traces should be retained for failures
+  And failure traces, screenshots, and videos should be retained
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- CI must provide actionable feedback.
-- Pull requests should prioritize type-check and smoke feedback.
+- `framework/playwright.config.ts`
+- `framework/.github/workflows/tests.yml`
 
-### Technical Notes
+**Definition of Done:**
 
-- Use `npm ci`, Playwright browser install, type-check, and targeted test scripts.
-- Upload `playwright-report` and `test-results` artifacts.
+- CI workflow uses `npm ci`.
+- Playwright browsers are installed.
+- Test reports and failure artifacts are uploaded.
+- A real GitHub Actions run validates artifact availability.
 
-### Definition of Done
-
-- CI job is configured or updated.
-- Artifacts are published.
-- Failure diagnostics are verified.
+---
 
 ## QA-US-025: Test Data and Flakiness Controls
 
-### Description
+**Epic:** Regression Hardening  
+**Sprint:** Sprint 5  
+**Priority:** High  
+**Story Points:** 8  
+**Current Automation Status:** Implemented
 
-Implement test data and reliability controls to keep automation stable against the mutable public OrangeHRM demo environment.
+**User Story:** As a QA Automation Engineer, I want dynamic test data and stable assertions so that tests remain reliable against the mutable public demo site.
 
-### Application URL
+**Business Value:** Reduces false failures caused by shared, changing public demo data.
 
-`https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+**Scenario Traceability:** DATA-001
 
-### Test Credentials
-
-- Username: Admin
-- Password: admin123
-
-### Acceptance Criteria
+**Acceptance Criteria:**
 
 ```gherkin
-Scenario: Tests avoid brittle live demo assumptions
-  Given the OrangeHRM demo data can change
+Scenario: Tests avoid brittle live-demo assumptions
+  Given OrangeHRM demo data can change
   When automation tests execute
-  Then tests should use centralized credentials
-  And employee creation should use unique generated data
-  And employee search should discover existing data dynamically
+  Then credentials and URLs should be centralized
+  And employee search should use dynamic discovery or generated records
   And assertions should avoid volatile dashboard values
+  And failure diagnostics should be available
 ```
 
-### Business Rules
+**Automation Mapping:**
 
-- Shared public data must not be assumed stable.
-- Destructive scenarios are out of scope unless safe ownership and cleanup are available.
+- `framework/tests/utils/test-data.ts`
+- `framework/tests/e2e/pim.spec.ts`
+- `framework/playwright.config.ts`
 
-### Technical Notes
+**Definition of Done:**
 
-- Generate unique suffixes for employee records.
-- Avoid fixed employee IDs, widget values, and record counts.
-- Use Playwright auto-waits and clear diagnostic messages.
-
-### Definition of Done
-
-- Test data helper supports unique generated data.
-- PIM tests use dynamic discovery or generated records.
-- Known flakiness risks are documented.
+- Keep credentials and URLs centralized.
+- Use generated unique employee data for create flows.
+- Use dynamic discovery for mutable employee records.
+- Track flaky cross-browser/mobile failures as hardening backlog items.

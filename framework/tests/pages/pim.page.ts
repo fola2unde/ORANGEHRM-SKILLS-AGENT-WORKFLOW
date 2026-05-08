@@ -14,6 +14,12 @@ export class PimPage extends BasePage {
   readonly addButton: Locator;
   readonly recordsFound: Locator;
   readonly employeeRows: Locator;
+  readonly firstNameInput: Locator;
+  readonly lastNameInput: Locator;
+  readonly employeeIdOnAddEmployeeInput: Locator;
+  readonly saveButton: Locator;
+  readonly requiredMessages: Locator;
+  readonly personalDetailsHeading: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -28,6 +34,12 @@ export class PimPage extends BasePage {
     this.addButton = page.getByRole('button', { name: /Add/ });
     this.recordsFound = page.getByText(/Records Found/);
     this.employeeRows = page.locator('.oxd-table-card');
+    this.firstNameInput = page.getByPlaceholder('First Name');
+    this.lastNameInput = page.getByPlaceholder('Last Name');
+    this.employeeIdOnAddEmployeeInput = page.locator('.orangehrm-employee-form input').last();
+    this.saveButton = page.getByRole('button', { name: 'Save' });
+    this.requiredMessages = page.getByText('Required');
+    this.personalDetailsHeading = page.getByRole('heading', { name: 'Personal Details' });
   }
 
   async navigate(): Promise<void> {
@@ -52,6 +64,18 @@ export class PimPage extends BasePage {
     await this.addButton.click();
   }
 
+  async saveAddEmployeeForm(): Promise<void> {
+    await this.saveButton.click();
+  }
+
+  async createEmployee(firstName: string, lastName: string): Promise<string> {
+    await this.firstNameInput.fill(firstName);
+    await this.lastNameInput.fill(lastName);
+    const employeeId = (await this.employeeIdOnAddEmployeeInput.inputValue()).trim();
+    await this.saveButton.click();
+    return employeeId;
+  }
+
   async getRecordSummary(): Promise<string> {
     return (await this.getElementText(this.recordsFound)).trim();
   }
@@ -62,5 +86,9 @@ export class PimPage extends BasePage {
 
   async getFirstEmployeeId(): Promise<string> {
     return (await this.employeeRows.first().locator('.oxd-table-cell').nth(1).textContent())?.trim() || '';
+  }
+
+  async getEmployeeIdSearchValue(): Promise<string> {
+    return this.employeeIdInput.inputValue();
   }
 }

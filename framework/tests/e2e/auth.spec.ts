@@ -13,7 +13,18 @@ test.describe('Authentication', () => {
     await page.goto(URLS.LOGIN);
   });
 
-  test('@smoke @critical - Should login with valid credentials', async ({ loginPage, page }) => {
+  test('AUTH-001 @smoke @critical - Should load login page', async ({ loginPage, page }) => {
+    await test.step('Verify login page shell', async () => {
+      await expect(page).toHaveTitle('OrangeHRM');
+      await expect(loginPage.loginPageTitle).toBeVisible();
+      await expect(loginPage.usernameInput).toBeVisible();
+      await expect(loginPage.passwordInput).toBeVisible();
+      await expect(loginPage.loginButton).toBeVisible();
+      logger.logAssertion('Login page smoke elements are visible');
+    });
+  });
+
+  test('AUTH-002 DASH-001 @smoke @critical - Should login with valid credentials', async ({ loginPage, page }) => {
     await test.step('Enter valid username and password', async () => {
       await loginPage.login(TEST_USERS.VALID_USER.username, TEST_USERS.VALID_USER.password);
     });
@@ -25,7 +36,7 @@ test.describe('Authentication', () => {
     });
   });
 
-  test('@smoke @critical - Should display error for invalid credentials', async ({
+  test('AUTH-003 @smoke @critical - Should display error for invalid credentials', async ({
     loginPage,
   }) => {
     await test.step('Enter invalid username and password', async () => {
@@ -38,7 +49,7 @@ test.describe('Authentication', () => {
     });
   });
 
-  test('@critical - Should logout successfully', async ({ loginPage, page }) => {
+  test('AUTH-008 @smoke @critical - Should logout successfully', async ({ loginPage, page }) => {
     await test.step('Login first', async () => {
       await loginPage.login(TEST_USERS.VALID_USER.username, TEST_USERS.VALID_USER.password);
       await expect(page).toHaveURL(/dashboard\/index/);
@@ -54,15 +65,27 @@ test.describe('Authentication', () => {
     });
   });
 
-  test('@regression - Should validate username field is required', async ({ loginPage }) => {
+  test('AUTH-004 @regression - Should validate username field is required', async ({ loginPage }) => {
     await test.step('Attempt to login without username', async () => {
       await loginPage.passwordInput.fill(TEST_USERS.VALID_USER.password);
       await loginPage.loginButton.click();
     });
 
     await test.step('Verify validation message appears', async () => {
-      await expect(loginPage.usernameInput.locator('..').getByText('Required')).toBeVisible();
+      await expect(loginPage.usernameRequiredMessage).toBeVisible();
       logger.logAssertion('Username validation working correctly');
+    });
+  });
+
+  test('AUTH-005 @regression - Should validate password field is required', async ({ loginPage }) => {
+    await test.step('Attempt to login without password', async () => {
+      await loginPage.usernameInput.fill(TEST_USERS.VALID_USER.username);
+      await loginPage.loginButton.click();
+    });
+
+    await test.step('Verify validation message appears', async () => {
+      await expect(loginPage.passwordRequiredMessage).toBeVisible();
+      logger.logAssertion('Password validation working correctly');
     });
   });
 
@@ -78,15 +101,35 @@ test.describe('Authentication', () => {
     });
   });
 
-  test('@regression - Should navigate to forgot password page', async ({ loginPage, page }) => {
+  test('AUTH-006 @regression - Should navigate to forgot password page', async ({ loginPage, page }) => {
     await test.step('Click forgot password link', async () => {
       await loginPage.clickForgotPassword();
     });
 
     await test.step('Verify forgot password page loads', async () => {
-      const currentUrl = page.url();
-      expect(currentUrl.toLowerCase()).toContain('forgot');
+      await expect(page).toHaveURL(URLS.FORGOT_PASSWORD);
+      await expect(loginPage.resetPasswordTitle).toBeVisible();
+      await expect(loginPage.resetUsernameInput).toBeVisible();
+      await expect(loginPage.resetCancelButton).toBeVisible();
+      await expect(loginPage.resetPasswordButton).toBeVisible();
       logger.logAssertion('Successfully navigated to forgot password page');
+    });
+  });
+
+  test('AUTH-007 @regression - Should cancel forgot password flow', async ({ loginPage, page }) => {
+    await test.step('Navigate to forgot password page', async () => {
+      await loginPage.clickForgotPassword();
+      await expect(page).toHaveURL(URLS.FORGOT_PASSWORD);
+    });
+
+    await test.step('Cancel password reset', async () => {
+      await loginPage.cancelPasswordReset();
+    });
+
+    await test.step('Verify user returns to login page', async () => {
+      await expect(page).toHaveURL(URLS.LOGIN);
+      await expect(loginPage.loginPageTitle).toBeVisible();
+      logger.logAssertion('Forgot password Cancel returned to login page');
     });
   });
 });

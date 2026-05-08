@@ -13,8 +13,19 @@ export class DashboardPage extends BasePage {
   readonly employeesOnLeaveWidget: Locator;
   readonly assignLeaveButton: Locator;
   readonly leaveListButton: Locator;
+  readonly timesheetsButton: Locator;
+  readonly applyLeaveButton: Locator;
+  readonly myLeaveButton: Locator;
   readonly myTimesheetButton: Locator;
   readonly userMenu: Locator;
+  readonly aboutMenuItem: Locator;
+  readonly supportMenuItem: Locator;
+  readonly changePasswordMenuItem: Locator;
+  readonly logoutMenuItem: Locator;
+  readonly pimNavigationLink: Locator;
+  readonly sideNavigationLinks: Locator;
+  readonly subUnitDistributionWidget: Locator;
+  readonly locationDistributionWidget: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -26,8 +37,19 @@ export class DashboardPage extends BasePage {
     this.employeesOnLeaveWidget = page.getByText('Employees on Leave Today');
     this.assignLeaveButton = page.getByRole('button', { name: 'Assign Leave' });
     this.leaveListButton = page.getByRole('button', { name: 'Leave List' });
+    this.timesheetsButton = page.getByRole('button', { name: 'Timesheets' });
+    this.applyLeaveButton = page.getByRole('button', { name: 'Apply Leave' });
+    this.myLeaveButton = page.getByRole('button', { name: 'My Leave' });
     this.myTimesheetButton = page.getByRole('button', { name: 'My Timesheet' });
     this.userMenu = page.locator('.oxd-userdropdown-tab');
+    this.aboutMenuItem = page.getByRole('menuitem', { name: 'About' });
+    this.supportMenuItem = page.getByRole('menuitem', { name: 'Support' });
+    this.changePasswordMenuItem = page.getByRole('menuitem', { name: 'Change Password' });
+    this.logoutMenuItem = page.getByRole('menuitem', { name: 'Logout' });
+    this.pimNavigationLink = page.getByRole('link', { name: 'PIM' });
+    this.sideNavigationLinks = page.locator('nav[aria-label="Sidepanel"] a');
+    this.subUnitDistributionWidget = page.getByText('Employee Distribution by Sub Unit');
+    this.locationDistributionWidget = page.getByText('Employee Distribution by Location');
   }
 
   /**
@@ -55,6 +77,18 @@ export class DashboardPage extends BasePage {
 
   async openLeaveList(): Promise<void> {
     await this.leaveListButton.click();
+  }
+
+  async openUserMenu(): Promise<void> {
+    await this.userMenu.click();
+  }
+
+  async navigateToPim(): Promise<void> {
+    await this.pimNavigationLink.click();
+  }
+
+  async getSideNavigationText(): Promise<string> {
+    return (await this.sideNavigationLinks.allTextContents()).join(' ');
   }
 
   /**

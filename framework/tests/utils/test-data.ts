@@ -27,6 +27,15 @@ export const TEST_EMPLOYEES = {
   INVALID_EMPLOYEE: 'No Such OrangeHRM Employee 99999',
 };
 
+export const generateEmployee = (): { firstName: string; lastName: string } => {
+  const suffix = Date.now().toString().slice(-6);
+
+  return {
+    firstName: `Auto${suffix}`,
+    lastName: `Tester${suffix}`,
+  };
+};
+
 export const TEST_ADDRESSES = {
   BILLING: {
     firstName: 'John',

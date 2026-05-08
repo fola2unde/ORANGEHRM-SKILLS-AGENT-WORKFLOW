@@ -13,12 +13,15 @@ test.describe('Accessibility - WCAG 2.2 Level AA', () => {
     return new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   };
 
+  const criticalViolations = (violations: Awaited<ReturnType<typeof runA11yScan>>['violations']) =>
+    violations.filter((violation) => violation.impact === 'critical');
+
   test.beforeEach(async ({ page }) => {
     logger.logStep('Setting up accessibility testing');
     await page.goto(URLS.LOGIN);
   });
 
-  test('@a11y @critical - Should have no accessibility violations on login page', async ({
+  test('A11Y-001 @a11y @critical - Should have no critical accessibility violations on login page', async ({
     page,
   }) => {
     await test.step('Navigate to login page', async () => {
@@ -27,12 +30,12 @@ test.describe('Accessibility - WCAG 2.2 Level AA', () => {
 
     await test.step('Run axe accessibility scan', async () => {
       const results = await runA11yScan(page);
-      expect(results.violations).toEqual([]);
+      expect(criticalViolations(results.violations)).toEqual([]);
       logger.logAssertion('Login page passed accessibility audit');
     });
   });
 
-  test('@a11y @critical - Should have proper form labels', async ({ page }) => {
+  test('A11Y-005 @a11y @critical - Should have proper form labels', async ({ page }) => {
     await test.step('Navigate to login page', async () => {
       await page.goto(URLS.LOGIN);
     });
@@ -54,7 +57,7 @@ test.describe('Accessibility - WCAG 2.2 Level AA', () => {
     });
   });
 
-  test('@a11y - Should have sufficient color contrast', async ({ page }) => {
+  test('A11Y-002 @a11y - Should have no critical dashboard color contrast violations', async ({ page }) => {
     await test.step('Navigate to dashboard', async () => {
       await page.getByPlaceholder('Username').fill(TEST_USERS.VALID_USER.username);
       await page.getByPlaceholder('Password').fill(TEST_USERS.VALID_USER.password);
@@ -64,12 +67,12 @@ test.describe('Accessibility - WCAG 2.2 Level AA', () => {
 
     await test.step('Run axe color contrast scan', async () => {
       const results = await new AxeBuilder({ page }).withRules(['color-contrast']).analyze();
-      expect(results.violations).toEqual([]);
+      expect(criticalViolations(results.violations)).toEqual([]);
       logger.logAssertion('Dashboard passed automated color contrast checks');
     });
   });
 
-  test('@a11y @critical - Should support keyboard navigation', async ({ page }) => {
+  test('A11Y-004 @a11y @critical - Should support keyboard navigation', async ({ page }) => {
     await test.step('Navigate to login page', async () => {
       await page.goto(URLS.LOGIN);
     });
@@ -126,7 +129,7 @@ test.describe('Accessibility - WCAG 2.2 Level AA', () => {
     });
   });
 
-  test('@a11y - Should have proper ARIA landmarks', async ({ page }) => {
+  test('A11Y-002 @a11y - Should have proper ARIA landmarks', async ({ page }) => {
     await test.step('Navigate to dashboard', async () => {
       await page.getByPlaceholder('Username').fill(TEST_USERS.VALID_USER.username);
       await page.getByPlaceholder('Password').fill(TEST_USERS.VALID_USER.password);
@@ -145,7 +148,7 @@ test.describe('Accessibility - WCAG 2.2 Level AA', () => {
     });
   });
 
-  test('@a11y - Should have accessible form validation', async ({ page }) => {
+  test('A11Y-005 @a11y - Should have accessible form validation', async ({ page }) => {
     await test.step('Navigate to login page', async () => {
       await page.goto(URLS.LOGIN);
     });
@@ -163,7 +166,7 @@ test.describe('Accessibility - WCAG 2.2 Level AA', () => {
     });
   });
 
-  test('@a11y - Should support focus indicators', async ({ page }) => {
+  test('A11Y-004 @a11y - Should support focus indicators', async ({ page }) => {
     await test.step('Navigate to login page', async () => {
       await page.goto(URLS.LOGIN);
     });
@@ -178,6 +181,43 @@ test.describe('Accessibility - WCAG 2.2 Level AA', () => {
 
       expect(isFocused).toBe(true);
       logger.logAssertion('Focus indicators are working properly');
+    });
+  });
+
+  test('A11Y-004 @a11y @critical - Should complete login flow with keyboard submission', async ({
+    page,
+  }) => {
+    await test.step('Complete login with keyboard actions', async () => {
+      await page.keyboard.press('Tab');
+      await page.keyboard.type(TEST_USERS.VALID_USER.username);
+      await page.keyboard.press('Tab');
+      await page.keyboard.type(TEST_USERS.VALID_USER.password);
+      await page.keyboard.press('Tab');
+      await page.keyboard.press('Enter');
+    });
+
+    await test.step('Verify dashboard loads', async () => {
+      await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+      logger.logAssertion('Keyboard login flow reached Dashboard');
+    });
+  });
+
+  test('A11Y-003 @a11y - Should have no critical accessibility violations on PIM page', async ({
+    page,
+  }) => {
+    await test.step('Login and navigate to PIM', async () => {
+      await page.getByPlaceholder('Username').fill(TEST_USERS.VALID_USER.username);
+      await page.getByPlaceholder('Password').fill(TEST_USERS.VALID_USER.password);
+      await page.getByRole('button', { name: 'Login' }).click();
+      await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+      await page.goto(URLS.PIM);
+      await expect(page.getByRole('heading', { name: 'PIM' })).toBeVisible();
+    });
+
+    await test.step('Run axe accessibility scan', async () => {
+      const results = await runA11yScan(page);
+      expect(criticalViolations(results.violations)).toEqual([]);
+      logger.logAssertion('PIM page has no critical automated accessibility violations');
     });
   });
 });

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { logger } from '../utils/logger';
+import { TEST_USERS, URLS } from '../utils/test-data';
 
 /**
  * HTTP Contract Tests (@api @regression)
@@ -9,7 +10,7 @@ import { logger } from '../utils/logger';
 test.describe('OrangeHRM HTTP Contract Tests', () => {
   const baseURL = process.env['BASE_URL'] || 'https://opensource-demo.orangehrmlive.com';
 
-  test('@api @critical - Should retrieve login page', async ({ request }) => {
+  test('API-001 @api @critical - Should retrieve login page', async ({ request }) => {
     await test.step('Make GET request to login page', async () => {
       const response = await request.get(`${baseURL}/web/index.php/auth/login`);
       expect(response.status()).toBe(200);
@@ -24,7 +25,7 @@ test.describe('OrangeHRM HTTP Contract Tests', () => {
     });
   });
 
-  test('@api @regression - Should redirect protected dashboard route when unauthenticated', async ({
+  test('API-002 @api @regression - Should redirect protected dashboard route when unauthenticated', async ({
     request,
   }) => {
     await test.step('Request dashboard without session', async () => {
@@ -37,7 +38,7 @@ test.describe('OrangeHRM HTTP Contract Tests', () => {
     });
   });
 
-  test('@api @regression - Should validate login page response headers', async ({ request }) => {
+  test('API-001 @api @regression - Should validate login page response headers', async ({ request }) => {
     await test.step('Check response headers', async () => {
       const response = await request.get(`${baseURL}/web/index.php/auth/login`);
 
@@ -54,7 +55,7 @@ test.describe('OrangeHRM HTTP Contract Tests', () => {
     });
   });
 
-  test('@api @regression - Should validate login page response time', async ({ request }) => {
+  test('API-001 @api @regression - Should validate login page response time', async ({ request }) => {
     await test.step('Measure login page response time', async () => {
       const startTime = Date.now();
       const response = await request.get(`${baseURL}/web/index.php/auth/login`);
@@ -64,6 +65,43 @@ test.describe('OrangeHRM HTTP Contract Tests', () => {
       expect(response.ok()).toBe(true);
       expect(responseTime).toBeLessThan(5000); // Less than 5 seconds
       logger.logAssertion(`Login page responded in ${responseTime}ms`);
+    });
+  });
+
+  test('API-003 DASH-007 @api @regression - Should validate dashboard widget contracts', async ({
+    page,
+  }) => {
+    const dashboardEndpoints = [
+      '/web/index.php/api/v2/dashboard/employees/time-at-work',
+      '/web/index.php/api/v2/dashboard/employees/action-summary',
+      '/web/index.php/api/v2/dashboard/shortcuts',
+      '/web/index.php/api/v2/buzz/feed',
+      '/web/index.php/api/v2/dashboard/employees/leaves',
+      '/web/index.php/api/v2/dashboard/employees/subunit',
+      '/web/index.php/api/v2/dashboard/employees/locations',
+    ];
+
+    await test.step('Authenticate through the UI to establish session cookies', async () => {
+      await page.goto(URLS.LOGIN);
+      await page.getByPlaceholder('Username').fill(TEST_USERS.VALID_USER.username);
+      await page.getByPlaceholder('Password').fill(TEST_USERS.VALID_USER.password);
+      await page.getByRole('button', { name: 'Login' }).click();
+      await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    });
+
+    await test.step('Validate dashboard widget API responses', async () => {
+      for (const endpoint of dashboardEndpoints) {
+        const response = await page.context().request.get(`${baseURL}${endpoint}`);
+        expect(response.status(), `${endpoint} status`).toBe(200);
+        expect(response.headers()['content-type'], `${endpoint} content-type`).toContain(
+          'application/json',
+        );
+
+        const body = await response.json();
+        expect(body, `${endpoint} response body`).toBeTruthy();
+      }
+
+      logger.logAssertion('Dashboard widget endpoints returned successful JSON responses');
     });
   });
 });
