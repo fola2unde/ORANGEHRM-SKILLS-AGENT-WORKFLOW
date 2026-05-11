@@ -10,11 +10,11 @@ Sprint ID: 35
 
 | Story ID | Jira Key | Summary | Sprint Update | Status |
 | --- | --- | --- | --- | --- |
-| QA-US-001 | OHRM-10 | Baseline Playwright Framework Configuration | Moved to OHRM Sprint 1 | In Progress |
-| QA-US-002 | OHRM-11 | Login Page Smoke Coverage | Moved to OHRM Sprint 1 | In Progress |
-| QA-US-003 | OHRM-5 | Valid Login and Dashboard Smoke Flow | Moved to OHRM Sprint 1 | In Progress |
-| QA-US-004 | OHRM-9 | Logout Smoke Flow | Moved to OHRM Sprint 1 | In Progress |
-| QA-US-005 | OHRM-12 | PIM Navigation Smoke Flow | Moved to OHRM Sprint 1 | In Progress |
+| QA-US-001 | OHRM-10 | Baseline Playwright Framework Configuration | Moved to OHRM Sprint 1 | Done |
+| QA-US-002 | OHRM-11 | Login Page Smoke Coverage | Moved to OHRM Sprint 1 | Done |
+| QA-US-003 | OHRM-5 | Valid Login and Dashboard Smoke Flow | Moved to OHRM Sprint 1 | Done |
+| QA-US-004 | OHRM-9 | Logout Smoke Flow | Moved to OHRM Sprint 1 | Done |
+| QA-US-005 | OHRM-12 | PIM Navigation Smoke Flow | Moved to OHRM Sprint 1 | Done |
 
 ## Automation Coverage Check
 
@@ -70,4 +70,5 @@ Executed scenarios:
 
 - The first local Sprint 1 test attempt was blocked by sandbox network restrictions with `net::ERR_NETWORK_ACCESS_DENIED`.
 - The same command was rerun with network approval and passed successfully against the OrangeHRM demo site.
-- Jira final verification confirmed all five Sprint 1 stories are `In Progress`.
+- Jira final verification on 2026-05-11 confirmed all five Sprint 1 stories are `Done`.
+- Sprint 1 close was attempted through the available Jira integration. Issue completion succeeded, but Jira sprint state still verified as `active` because no dedicated complete-sprint tool is exposed and the Agile API proxy close call was blocked by proxy SSRF validation.

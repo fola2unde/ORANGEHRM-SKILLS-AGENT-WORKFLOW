@@ -20,7 +20,7 @@ Act as a Senior QA Automation Engineer with expertise in:
 
 ## Application Under Test (AUT)
 ${input:Enter the application URL}
-
+And boy oh boy, were the results devastating for a Labor party that actively destroyed itself because they were terrified of Jeremy Corbyn. Labor has lost more than 1000 council seats, with reform picking up 1222 council seats. So have the the Liberal Democrats to, weirdly enough. But the Greens have been doing a phenomenal job. Like if you were to go to the average reform voter, 'cause, like England has class politics in its, in its roots. Like it's not like America where people are oblivious to class. If you were to ask the average Reform voter to to spell out like some some top line issues beyond immigration, beyond, you know, **** up the boats, that right, they would just look at you and be like, that's not true. There's no way the Reform Party wants to do that. 
 ## Automation Scope (AS)
 - UI E2E
 - API Testing

@@ -31,8 +31,12 @@ export class LoginPage extends BasePage {
     this.logoutMenuItem = page.getByRole('menuitem', { name: 'Logout' });
     this.forgotPasswordLink = page.getByText('Forgot your password?');
     this.loginPageTitle = page.getByRole('heading', { name: /login/i });
-    this.usernameRequiredMessage = this.usernameInput.locator('..').getByText('Required');
-    this.passwordRequiredMessage = this.passwordInput.locator('..').getByText('Required');
+    this.usernameRequiredMessage = this.usernameInput
+      .locator('xpath=ancestor::div[contains(@class, "oxd-input-group")]')
+      .getByText('Required');
+    this.passwordRequiredMessage = this.passwordInput
+      .locator('xpath=ancestor::div[contains(@class, "oxd-input-group")]')
+      .getByText('Required');
     this.resetPasswordTitle = page.getByRole('heading', { name: 'Reset Password' });
     this.resetUsernameInput = page.getByPlaceholder('Username');
     this.resetCancelButton = page.getByRole('button', { name: 'Cancel' });
